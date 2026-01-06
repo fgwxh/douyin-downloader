@@ -1,0 +1,21 @@
+{
+    "accounts": [
+        {
+            "mark": "",
+            "url": "",
+            "earliest": "2020/01/01",
+            "latest": "2020/01/02"
+        }
+    ],
+    "save_folder": ".",
+    "download_videos": true,
+    "download_images": false,
+    "name_format": ["create_time", "id", "type", "desc"],
+    "split": "-",
+    "date_format": "%Y-%m-%d",
+    "proxy": "http://192.168.5.4:7899",
+    "file_description_max_length": 64,
+    "chunk_size": 1048576,
+    "timeout": 300,
+    "concurrency": 5
+}
