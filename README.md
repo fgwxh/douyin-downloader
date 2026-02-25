@@ -46,6 +46,46 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8501 --workers 2
 - **前端页面**：`http://localhost:8501/frontend`
 - **API文档**：`http://localhost:8501/docs`
 
+### 4. Docker部署
+
+#### 4.1 Docker仓库地址
+
+- **Docker Hub**：`https://hub.docker.com/r/fgwxh123/douyin-xz`
+- **镜像名称**：`fgwxh123/douyin-xz:latest`
+
+#### 4.2 Docker Compose部署
+
+创建 `docker-compose.yml` 文件：
+
+```yaml
+services:
+  douyin-download:
+    image: fgwxh123/douyin-xz:latest
+    container_name: douyin-download-ui
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data:rw
+      - ./downloads:/app/downloads:rw
+    environment:
+      - TZ=Asia/Shanghai
+      - DOCKER_CONTAINER=true
+```
+
+启动服务：
+
+```bash
+docker-compose up -d
+```
+
+#### 4.3 Docker部署注意事项
+
+- **持久化存储**：通过卷挂载将 `./data` 和 `./downloads` 目录持久化到宿主机
+- **保存文件夹路径**：在Web界面中填写容器内路径，推荐使用 `/app/downloads`
+- **端口映射**：默认映射8501端口，可根据需要修改
+- **时区设置**：已设置为亚洲/上海时区
+
 ## 使用指南
 
 ### 1. 账号管理
