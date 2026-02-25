@@ -46,11 +46,32 @@ class Account:
             self.latest_date = self._generate_date_latest()
 
     def _extract_sec_user_id(self) -> str | None:
+        if not self.url:
+            print(f'[{Colors.RED}]参数 accounts 中账号 {self.mark} 的 url 为空，提取 sec_user_id 失败！')
+            return None
+        
+        # 处理包含sec_user_id参数的URL
+        if 'sec_user_id=' in self.url:
+            return self.url.split('sec_user_id=')[1].split('&')[0]
+        
+        # 处理普通用户URL格式 https://www.douyin.com/user/xxx
         match_url = match(r'https://www\.douyin\.com/user/([A-Za-z0-9_-]+)(\?.*)?', self.url)
         if match_url:
             return match_url.group(1)
-        print(f'[{Colors.RED}]参数 accounts 中账号 {self.mark} 的 url {self.url} 错误，提取 sec_user_id 失败！')
-        sys.exit()
+        
+        # 处理无www前缀的URL
+        match_url = match(r'https://douyin\.com/user/([A-Za-z0-9_-]+)(\?.*)?', self.url)
+        if match_url:
+            return match_url.group(1)
+        
+        # 处理短链接格式
+        match_url = match(r'https://v\.douyin\.com/[A-Za-z0-9]+', self.url)
+        if match_url:
+            print(f'[{Colors.YELLOW}]参数 accounts 中账号 {self.mark} 的 url 是短链接格式，需要手动解析 sec_user_id')
+            return None
+        
+        print(f'[{Colors.RED}]参数 accounts 中账号 {self.mark} 的 url {self.url} 格式错误，提取 sec_user_id 失败！')
+        return None
 
     def _generate_date_earliest(self) -> date:
         try:
@@ -84,13 +105,26 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    if not (filepath := PROJECT_ROOT / 'settings_mine.json').exists():
+    # 优先检查 ./data/settings_mine.json（与app.py中的保存位置一致）
+    data_settings = PROJECT_ROOT / 'data' / 'settings_mine.json'
+    root_settings = PROJECT_ROOT / 'settings_mine.json'
+    
+    if data_settings.exists():
+        filepath = data_settings
+    elif root_settings.exists():
+        filepath = root_settings
+    else:
         filepath = PROJECT_ROOT / 'settings_default.json'
+    
     try:
         with open(filepath, encoding=ENCODE) as f:
             data = load(f)
+        print(f'[{Colors.GREEN}]成功加载配置文件: {filepath}')
     except JSONDecodeError:
         print(f'[{Colors.RED}]配置文件 {filepath.name} 格式错误，请检查 JSON 格式！')
+        sys.exit()
+    except Exception as e:
+        print(f'[{Colors.RED}]加载配置文件 {filepath.name} 失败: {str(e)}')
         sys.exit()
 
     accounts = tuple(Account(**a) for a in data["accounts"])

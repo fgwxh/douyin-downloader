@@ -11,6 +11,7 @@ except ImportError:
     pyperclip = None
 
 from datetime import datetime, date, timedelta
+from src.tool import logger
 
 # 检查是否在Docker环境中
 IS_DOCKER = os.environ.get('DOCKER_CONTAINER', 'false').lower() == 'true' or os.path.exists('/.dockerenv')
@@ -71,15 +72,50 @@ DEFAULT_SETTINGS = {
 
 # 加载配置文件
 def load_settings():
-    if SETTINGS_FILE.exists():
-        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+    # 只从 data/settings_mine.json 加载设置
+    settings_paths = [
+        Path("./data/settings_mine.json"),  # 主要位置
+        Path("./settings_default.json")   # 默认位置
+    ]
+    
+    # 尝试从多个位置加载设置
+    for path in settings_paths:
+        if path.exists():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    settings = json.load(f)
+                print(f"设置加载成功，来源: {path}")
+                return settings
+            except Exception as e:
+                print(f"加载设置从 {path} 失败: {str(e)}")
+    
+    # 如果所有位置都失败，返回默认设置
+    print("所有位置加载设置失败，返回默认设置")
     return DEFAULT_SETTINGS.copy()
 
 # 保存配置文件
 def save_settings(settings):
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
-        json.dump(settings, f, ensure_ascii=False, indent=4)
+    # 只保存到 data/settings_mine.json 文件
+    settings_paths = [
+        Path("./data/settings_mine.json")  # 主要位置
+    ]
+    
+    # 确保至少保存一个位置成功
+    saved = False
+    for path in settings_paths:
+        try:
+            # 确保目录存在
+            path.parent.mkdir(exist_ok=True)
+            
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(settings, f, ensure_ascii=False, indent=4)
+            print(f"设置保存成功到: {path}")
+            saved = True
+        except Exception as e:
+            print(f"保存设置到 {path} 失败: {str(e)}")
+    
+    if not saved:
+        raise Exception("无法保存设置到任何位置，请检查文件权限")
 
 # 加载Cookie文件
 def load_cookies():
@@ -147,8 +183,28 @@ def main():
     settings = load_settings()
     cookies = load_cookies()
     
+    # 初始化session_state保存临时状态
+    if 'new_account_state' not in st.session_state:
+        st.session_state.new_account_state = {
+            'mark': '',
+            'url': '',
+            'date_mode': '日历选择',
+            'earliest_str': (date.today() - timedelta(days=365)).strftime("%Y/%m/%d"),
+            'latest_str': date.today().strftime("%Y/%m/%d")
+        }
+    
+    # 初始化session_state保存现有账号的临时修改
+    if 'existing_accounts_state' not in st.session_state:
+        st.session_state.existing_accounts_state = []
+    
+    # 初始化每个账号的日期模式持久化
+    for i, account in enumerate(settings["accounts"]):
+        date_mode_key = f"date_mode_{i}"
+        if date_mode_key not in st.session_state:
+            st.session_state[date_mode_key] = "日历选择"
+    
     # 创建标签页
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📁 账号管理", "⚙️ 下载设置", "🍪 Cookie设置", "▶️ 开始下载", "📋 作品管理"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📁 账号管理", "⚙️ 下载设置", "🍪 Cookie设置", "▶️ 开始下载", "📋 作品管理", "📜 运行日志"])
     
     # 账号管理标签页
     with tab1:
@@ -158,22 +214,46 @@ def main():
         with st.expander("添加新账号", expanded=False):
             col1, col2 = st.columns(2)
             with col1:
-                mark = st.text_input("账号标识", key="new_mark")
-                url = st.text_input("账号主页链接", key="new_url")
+                mark = st.text_input("账号标识", value=st.session_state.new_account_state['mark'], key="new_mark")
+                url = st.text_input("账号主页链接", value=st.session_state.new_account_state['url'], key="new_url")
             with col2:
                 # 日期输入方式选择
-                date_input_mode = st.radio("日期输入方式", ["日历选择", "手动填写"], key="new_date_mode")
+                date_input_mode = st.radio("日期输入方式", ["日历选择", "手动填写"], index=0 if st.session_state.new_account_state['date_mode'] == "日历选择" else 1, key="new_date_mode")
                 
                 if date_input_mode == "日历选择":
-                    # 使用Streamlit的默认日期选择器
-                    earliest = st.date_input("最早发布日期", key="new_earliest")
-                    latest = st.date_input("最晚发布日期", key="new_latest")
+                    # 使用Streamlit的默认日期选择器，确保value是有效的date对象
+                    def get_valid_date(value, default_days=365):
+                        try:
+                            if isinstance(value, str):
+                                return datetime.strptime(value, "%Y/%m/%d").date()
+                        except:
+                            pass
+                        return date.today() - timedelta(days=default_days)
+                    
+                    # 从session_state读取字符串格式的日期
+                    earliest_val = get_valid_date(st.session_state.new_account_state.get('earliest_str', ''), 365)
+                    latest_val = get_valid_date(st.session_state.new_account_state.get('latest_str', ''), 0)
+                    
+                    # 直接使用日历选择器的值
+                    earliest = st.date_input("最早发布日期", value=earliest_val, key="new_earliest")
+                    latest = st.date_input("最晚发布日期", value=latest_val, key="new_latest")
                     # 将date对象转换为字符串格式
-                    earliest_str = earliest.strftime("%Y/%m/%d") if earliest else ""
-                    latest_str = latest.strftime("%Y/%m/%d") if latest else ""
+                    earliest_str = earliest.strftime("%Y/%m/%d")
+                    latest_str = latest.strftime("%Y/%m/%d")
+                    # 直接更新session_state，确保使用正确的日期值
+                    st.session_state.new_account_state['earliest_str'] = earliest_str
+                    st.session_state.new_account_state['latest_str'] = latest_str
                 else:
-                    earliest_str = st.text_input("最早发布日期 (YYYY/MM/DD)", key="new_earliest")
-                    latest_str = st.text_input("最晚发布日期 (YYYY/MM/DD)", key="new_latest")
+                    earliest_str = st.text_input("最早发布日期 (YYYY/MM/DD)", value=st.session_state.new_account_state['earliest_str'], key="new_earliest_str")
+                    latest_str = st.text_input("最晚发布日期 (YYYY/MM/DD)", value=st.session_state.new_account_state['latest_str'], key="new_latest_str")
+                    # 直接更新session_state，确保使用正确的日期值
+                    st.session_state.new_account_state['earliest_str'] = earliest_str
+                    st.session_state.new_account_state['latest_str'] = latest_str
+            
+            # 实时更新session_state
+            st.session_state.new_account_state['mark'] = mark
+            st.session_state.new_account_state['url'] = url
+            st.session_state.new_account_state['date_mode'] = date_input_mode
             
             if st.button("添加账号"):
                 if url:
@@ -185,6 +265,14 @@ def main():
                     }
                     settings["accounts"].append(new_account)
                     save_settings(settings)
+                    # 重置新账号表单
+                    st.session_state.new_account_state = {
+                        'mark': '',
+                        'url': '',
+                        'date_mode': '日历选择',
+                        'earliest_str': (date.today() - timedelta(days=365)).strftime("%Y/%m/%d"),
+                        'latest_str': date.today().strftime("%Y/%m/%d")
+                    }
                     st.success("账号添加成功!")
                     st.rerun()
                 else:
@@ -192,49 +280,94 @@ def main():
         
         # 显示现有账号
         st.subheader("现有账号")
+        
+        # 确保existing_accounts_state与settings["accounts"]同步
+        while len(st.session_state.existing_accounts_state) < len(settings["accounts"]):
+            st.session_state.existing_accounts_state.append({})
+        
+        while len(st.session_state.existing_accounts_state) > len(settings["accounts"]):
+            st.session_state.existing_accounts_state.pop()
+        
         for i, account in enumerate(settings["accounts"]):
-            with st.expander(f"账号 {i+1}: {account.get('mark', '未命名')}"):
+            # 确保每个账号都有对应的临时状态
+            if i >= len(st.session_state.existing_accounts_state):
+                st.session_state.existing_accounts_state.append({})
+            
+            # 获取临时状态，默认为当前账号的原始值
+            temp_account = st.session_state.existing_accounts_state[i]
+            
+            # 初始化临时状态，使用当前账号的值
+            if not temp_account:
+                temp_account.update({
+                    'mark': account.get('mark', ''),
+                    'url': account.get('url', ''),
+                    'earliest': account.get('earliest', ''),
+                    'latest': account.get('latest', ''),
+                    'date_mode': '日历选择'
+                })
+                st.session_state.existing_accounts_state[i] = temp_account
+            
+            with st.expander(f"账号 {i+1}: {temp_account.get('mark', '未命名')}"):
                 col1, col2 = st.columns(2)
                 with col1:
-                    account["mark"] = st.text_input("账号标识", value=account["mark"], key=f"mark_{i}")
-                    account["url"] = st.text_input("账号主页链接", value=account["url"], key=f"url_{i}")
+                    # 账号标识和URL输入
+                    temp_account['mark'] = st.text_input("账号标识", value=temp_account['mark'], key=f"mark_{i}")
+                    temp_account['url'] = st.text_input("账号主页链接", value=temp_account['url'], key=f"url_{i}")
+                    
+                    # 更新session_state中的临时状态
+                    st.session_state.existing_accounts_state[i] = temp_account
                 with col2:
                     # 日期输入方式选择
-                    date_input_mode = st.radio("日期输入方式", ["日历选择", "手动填写"], key=f"date_mode_{i}")
+                    temp_account['date_mode'] = st.radio("日期输入方式", ["日历选择", "手动填写"], key=f"date_mode_{i}")
                     
-                    if date_input_mode == "日历选择":
+                    if temp_account['date_mode'] == "日历选择":
                         # 将字符串日期转换为date对象
                         def str_to_date(date_str):
                             if not date_str:
-                                return None
+                                return date.today() - timedelta(days=365)
                             try:
                                 return datetime.strptime(date_str, "%Y/%m/%d").date()
                             except:
-                                return None
+                                return date.today() - timedelta(days=365)
                         
-                        earliest_date = str_to_date(account["earliest"])
-                        latest_date = str_to_date(account["latest"])
+                        # 转换为date对象用于显示
+                        earliest_date = str_to_date(temp_account.get('earliest', ''))
+                        latest_date = str_to_date(temp_account.get('latest', ''))
                         
                         # 使用Streamlit的默认日期选择器
                         selected_earliest = st.date_input("最早发布日期", value=earliest_date, key=f"earliest_{i}")
                         selected_latest = st.date_input("最晚发布日期", value=latest_date, key=f"latest_{i}")
                         
                         # 将date对象转换回字符串格式
-                        account["earliest"] = selected_earliest.strftime("%Y/%m/%d") if selected_earliest else ""
-                        account["latest"] = selected_latest.strftime("%Y/%m/%d") if selected_latest else ""
+                        temp_account['earliest'] = selected_earliest.strftime("%Y/%m/%d") if selected_earliest else ""
+                        temp_account['latest'] = selected_latest.strftime("%Y/%m/%d") if selected_latest else ""
                     else:
                         # 手动填写日期
-                        account["earliest"] = st.text_input("最早发布日期 (YYYY/MM/DD)", value=account["earliest"], key=f"earliest_{i}")
-                        account["latest"] = st.text_input("最晚发布日期 (YYYY/MM/DD)", value=account["latest"], key=f"latest_{i}")
+                        temp_account['earliest'] = st.text_input("最早发布日期 (YYYY/MM/DD)", value=temp_account['earliest'], key=f"earliest_str_{i}")
+                        temp_account['latest'] = st.text_input("最晚发布日期 (YYYY/MM/DD)", value=temp_account['latest'], key=f"latest_str_{i}")
+                    
+                    # 更新session_state中的临时状态
+                    st.session_state.existing_accounts_state[i] = temp_account
                 
                 if st.button("删除账号", key=f"delete_{i}"):
                     settings["accounts"].pop(i)
+                    st.session_state.existing_accounts_state.pop(i)
                     save_settings(settings)
                     st.success("账号删除成功!")
                     st.rerun()
         
-        # 保存账号修改
+        # 保存账号修改按钮
         if st.button("保存账号修改"):
+            # 将临时状态中的修改应用到实际的settings对象
+            for i, temp_account in enumerate(st.session_state.existing_accounts_state):
+                if i < len(settings["accounts"]):
+                    account = settings["accounts"][i]
+                    account['mark'] = temp_account.get('mark', account.get('mark', ''))
+                    account['url'] = temp_account.get('url', account.get('url', ''))
+                    account['earliest'] = temp_account.get('earliest', account.get('earliest', ''))
+                    account['latest'] = temp_account.get('latest', account.get('latest', ''))
+            
+            # 保存设置
             save_settings(settings)
             st.success("账号修改保存成功!")
     
@@ -484,9 +617,36 @@ def main():
         else:
             # 选择账号
             st.subheader("选择账号")
-            account_options = [f"{account.get('mark', '未命名')} - {account['url']}" for account in settings['accounts']]
-            selected_account_index = st.selectbox("请选择账号", range(len(account_options)), format_func=lambda x: account_options[x])
-            selected_account = settings['accounts'][selected_account_index]
+            # 重新加载设置，确保包含新添加的账号
+            from src.config import load_settings as load_config_settings
+            from json import load
+            from pathlib import Path
+            
+            # 直接从文件加载最新的账号列表，优先检查 ./data/settings_mine.json
+            data_settings = Path('./data/settings_mine.json')
+            root_settings = Path('settings_mine.json')
+            default_settings = Path('settings_default.json')
+            
+            # 优先顺序：./data/settings_mine.json > ./settings_mine.json > ./settings_default.json
+            if data_settings.exists():
+                filepath = data_settings
+            elif root_settings.exists():
+                filepath = root_settings
+            else:
+                filepath = default_settings
+                
+            try:
+                with open(filepath, encoding='utf-8') as f:
+                    latest_settings = load(f)
+                account_options = [f"{account.get('mark', '未命名')} - {account['url']}" for account in latest_settings['accounts']]
+                selected_account_index = st.selectbox("请选择账号", range(len(account_options)), format_func=lambda x: account_options[x])
+                selected_account = latest_settings['accounts'][selected_account_index]
+                st.info(f"加载账号列表成功，来源: {filepath}")
+            except Exception as e:
+                st.error(f"加载账号列表失败: {str(e)}")
+                account_options = [f"{account.get('mark', '未命名')} - {account['url']}" for account in settings['accounts']]
+                selected_account_index = st.selectbox("请选择账号", range(len(account_options)), format_func=lambda x: account_options[x])
+                selected_account = settings['accounts'][selected_account_index]
             
             # 导入必要的模块
             from src.download.acquire import Acquire
@@ -629,7 +789,7 @@ def main():
                             st.info("已切换到无代理模式")
                             
                             # 尝试获取作品列表
-                            items = acquire.request_items(sec_user_id, earliest_date_obj, temp_settings, config_cookie)
+                            items = acquire.request_items(sec_user_id, earliest_date_obj, latest_date_obj, temp_settings, config_cookie)
                         except Exception as e:
                             st.error(f"无代理连接测试失败: {str(e)}")
                             
@@ -639,7 +799,7 @@ def main():
                                     test_response = requests.get(test_url, timeout=10, proxies={'http': config_settings.proxy, 'https': config_settings.proxy})
                                     st.info(f"代理连接测试成功: {test_url}，状态码: {test_response.status_code}")
                                     # 尝试获取作品列表
-                                    items = acquire.request_items(sec_user_id, earliest_date_obj, config_settings, config_cookie)
+                                    items = acquire.request_items(sec_user_id, earliest_date_obj, latest_date_obj, config_settings, config_cookie)
                                 except Exception as e:
                                     st.error(f"代理连接测试失败: {str(e)}")
                                     st.error("请检查代理设置是否正确")
@@ -781,6 +941,44 @@ def main():
                             st.error(f"错误详情：{traceback.format_exc()}")
                     else:
                         st.error("请先选择要下载的作品")
+        
+        # 运行日志标签页
+        with tab6:
+            st.subheader("📜 系统运行日志")
+            
+            # 日志操作区域
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                refresh_logs = st.button("🔄 刷新日志")
+            with col2:
+                log_level = st.selectbox("日志级别", ["全部", "INFO", "SUCCESS", "WARNING", "ERROR", "DEBUG"], index=0)
+            with col3:
+                clear_logs = st.button("🗑️ 清空日志")
+            
+            # 获取日志内容
+            logs = logger.get_logs()
+            
+            # 按级别筛选日志
+            if log_level != "全部":
+                level_filter = f"| {log_level:<8} |"
+                logs = [line for line in logs if level_filter in line]
+            
+            # 显示日志
+            if logs:
+                # 最新的日志显示在最前面
+                reversed_logs = logs[::-1]
+                st.text_area("日志内容", value="\n".join(reversed_logs), height=600)
+                st.info(f"共显示 {len(logs)} 条日志")
+            else:
+                st.info("暂无日志记录")
+            
+            # 清空日志功能
+            if clear_logs:
+                if logger.clear_logs():
+                    st.success("日志已清空")
+                    st.rerun()
+                else:
+                    st.error("清空日志失败")
 
 # 运行应用
 if __name__ == "__main__":

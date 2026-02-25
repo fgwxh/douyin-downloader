@@ -1,0 +1,13 @@
+services:
+  douyin-download:
+    image: fgwxh123/douyin-xz:latest
+    container_name: douyin-download-ui
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data:rw
+      - ./downloads:/app/downloads:rw
+    environment:
+      - TZ=Asia/Shanghai
+      - DOCKER_CONTAINER=true

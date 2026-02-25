@@ -2,11 +2,10 @@ from requests import (
     post,
     exceptions
 )
-from rich import print
 
 from ..config import USER_AGENT, Colors
 from ..config.settings import load_settings
-from ..tool import retry
+from ..tool import retry, logger
 
 
 HEADERS = {'User-Agent': USER_AGENT}
@@ -37,4 +36,4 @@ def extract_value(response_headers: dict, key: str):
             value = set_cookie.split('; ')[0].split('=', 1)
             return {value[0]: value[1]}
         except IndexError:
-            print(f'[{Colors.RED}]获取 {key} 参数失败！')
+            logger.error(f'获取 {key} 参数失败！')

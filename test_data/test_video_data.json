@@ -1,0 +1,19 @@
+{
+    "aweme_id": "7606938099470713064",
+    "desc": "抖音视频测试",
+    "create_time": 1771925400,
+    "video": {
+        "play_addr": {
+            "url_list": [
+                "https://v3-dy.bytecdn.cn/video/tos/cn/tos-cn-ve-27740c00/o7606938099470713064/"
+            ]
+        },
+        "height": 1080,
+        "width": 1920,
+        "cover": {
+            "url_list": [
+                "https://p3-dy.byteimg.com/aweme/720x720/7606938099470713064.jpg"
+            ]
+        }
+    }
+}

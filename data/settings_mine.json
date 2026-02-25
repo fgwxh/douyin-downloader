@@ -2,18 +2,8 @@
     "accounts": [],
     "save_folder": ".",
     "download_videos": true,
-    "download_images": true,
-    "name_format": [
-        "create_time",
-        "id",
-        "type",
-        "desc"
-    ],
-    "split": "-",
-    "date_format": "%Y-%m-%d",
+    "download_images": false,
     "proxy": "",
-    "file_description_max_length": 64,
-    "chunk_size": 1048576,
     "timeout": 300,
     "concurrency": 5
 }

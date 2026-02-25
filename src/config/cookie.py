@@ -1,8 +1,8 @@
 from re import finditer
-from rich import print
 from json import load, dump
 
 from .settings import Colors, PROJECT_ROOT, ENCODE
+from ..tool import logger
 
 
 class Cookie:
@@ -84,9 +84,9 @@ class Cookie:
 
     def _check(self) -> None:
         if not self.cookies['sessionid_ss']:
-            print(f'[{Colors.CYAN}]当前 Cookie 未登录')
+            logger.info('当前 Cookie 未登录')
         else:
-            print(f'[{Colors.CYAN}]当前 Cookie 已登录')
+            logger.info('当前 Cookie 已登录')
 
         keys_to_remove = [key for key, value in self.cookies.items() if value is None]
         for key in keys_to_remove:
@@ -95,7 +95,7 @@ class Cookie:
     def _save_json(self) -> None:
         with open(PROJECT_ROOT / 'cookies.json', 'w', encoding=ENCODE) as f:
             dump(self.cookies, f, ensure_ascii=False, indent=4)
-        print(f'[{Colors.GREEN}]写入 Cookie 成功！')
+        logger.success('写入 Cookie 成功！')
 
     def input_save(self) -> None:
         while not (cookie := input(f'请粘贴 Cookie 内容: ')):

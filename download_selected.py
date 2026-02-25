@@ -28,7 +28,7 @@ if __name__ == '__main__':
         account_mark = selected_items[0].get('account_mark', '未命名')
         
         # 下载作品
-        Download.download_files(selected_items, account_id, account_mark, settings, cleaner, cookie)
+        Download.download_items(selected_items, settings, cookie, cleaner)
         
         print('下载完成！')
     except FileNotFoundError:

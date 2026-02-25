@@ -1,245 +1,276 @@
-# DouYinDownload
+# 抖音作品下载工具
 
-## 项目介绍
+🎵 一个功能强大的抖音作品下载工具，支持批量下载抖音账号的作品，包括视频和图片，同时提供作品管理和预览功能。
 
-本项目是基于GitHub大佬 [GuanDD123](https://github.com/GuanDD123) 的 [douyin_download](https://github.com/GuanDD123/douyin_download) 项目进行优化和扩展的抖音作品下载工具。
+## 功能特点
 
-在原项目的基础上，我们添加了以下功能：
-- 可视化UI界面，支持账号管理、Cookie管理、作品管理等功能
-- 作品管理功能，支持读取现有账号的作品目录、勾选选择作品、下载选中的作品
-- 自动跳转到网页端功能，打开脚本时自动打开浏览器
-- 退出程序按钮，可在UI界面直接退出程序
-- 网络连接优化，优先使用无代理连接，提高下载成功率
-- 视频格式优化，强制使用.mp4扩展名，避免下载到.dash文件
+- 📁 **账号管理**：支持添加、编辑、删除多个抖音账号
+- ⚙️ **下载设置**：可自定义保存文件夹、下载类型、命名格式等
+- 🍪 **Cookie设置**：支持配置抖音Cookie，提高下载成功率
+- ▶️ **批量下载**：支持批量下载多个作品，可指定日期范围
+- 📋 **作品管理**：支持查看已下载的作品列表，包括视频预览功能
+- 🎥 **视频预览**：支持视频在线预览，包括播放、暂停、音量、全屏等控制
+- � **视频代理**：内置视频代理功能，绕过CORS限制，确保视频正常加载
+- �📜 **运行日志**：实时显示下载状态和运行日志
+- 🌐 **API接口**：提供完整的RESTful API接口，方便集成到其他系统
 
-## 项目功能
+## 技术栈
 
-1. 使用协程下载视频与图集（协程数为 5）
-2. 配置文件可设置是否下载视频、是否下载图集。
-3. 使用配置文件连续下载多个帐号视频。
-4. 可视化UI界面，支持账号管理、Cookie管理、作品管理等功能。
-5. 作品管理功能，支持读取现有账号的作品目录、勾选选择作品、下载选中的作品。
-6. 自动跳转到网页端功能，打开脚本时自动打开浏览器。
-7. 退出程序按钮，可在UI界面直接退出程序。
-8. 网络连接优化，优先使用无代理连接，提高下载成功率。
-9. 视频格式优化，强制使用.mp4扩展名，避免下载到.dash文件。
+- **后端**：FastAPI + Python
+- **前端**：HTML5 + CSS3 + JavaScript
+- **数据库**：SQLite
+- **依赖**：requests, pydantic, uvicorn
 
-### 运行截图
+## 快速开始
 
-![](images/运行截图1.png)
-![](images/运行截图2.png)
-![](images/运行截图3.png)
-![](images/运行截图4.png)
-![](images/运行截图5.png)
+### 1. 安装依赖
 
-### 提示图片
-
-- **复制cookie.png**：如何从浏览器复制抖音Cookie的示意图
-- **运行截图1.png**：UI界面的账号管理和下载设置标签页截图
-- **运行截图2.png**：UI界面的启动cmd窗口截图
-- **运行截图3.png**：提示：若部署在本地服务端，请将下方出现的ip(运行截图3所示)替换为您实际的服务器 IP，例如 `http://your_server_ip:8522`
-- **运行截图4.png**：电脑端抖音作者主页的链接格式
-- **运行截图5.png**：vid获取方法
-
-## 配置文件说明
-
-### 配置文件优先级
-
-程序运行时会按照以下优先级加载配置文件：
-1. **settings_mine.json**：用户自定义配置文件（优先使用）
-2. **settings_default.json**：默认配置文件（当 settings_mine.json 不存在时使用）
-
-### 配置建议
-- **首次配置**：复制 `settings_default.json` 为 `settings_mine.json`，然后在 `settings_mine.json` 中进行个性化配置
-- **后续修改**：直接修改 `settings_mine.json` 文件，不会影响默认配置
-- **恢复默认**：删除 `settings_mine.json` 文件，程序会自动使用 `settings_default.json`
-
-### 必要参数
-
-| 条目            | 说明                                                                                                 |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
-| accounts        | 要下载的帐号信息，可添加多个帐号                                                                     |
-| mark            | 账号标识，可以设置为空字符串                                                                         |
-| url             | 账号主页链接（必须为电脑网页端链接）                                                                 |
-| earliest        | 要下载的作品最早发布日期（默认为 2016/9/20）                                                         |
-| latest          | 要下载的作品最晚发布日期（默认为 前一天日期）                                                        |
-
-- **注意**：cookies 为必要参数，但不需要通过配置文件修改，而是通过程序运行自动配置。可根据下图从浏览器复制
- ![](images/复制cookie.png)
-
-### 可选参数
-
-| 条目            | 说明                                                                                                 | json 配置示例             |
-| --------------- | ---------------------------------------------------------------------------------------------------- | ------------------------- |
-| save_folder     | 下载视频存储文件夹（默认为项目根目录）                                                               | "save_folder": "douyin/my_folder" |
-| download_videos | 设置为 false，则不下载视频                                                                           | "download_videos": false |
-| download_images | 设置为 false，则不下载图集                                                                           | "download_images": false |
-| name_format     | 下载的视频命名格式（可选项：create_time(视频发布日期) id(视频 id) type(图集/视频) desc(视频描述文本) | "name_format": [ "create_time", "id" ] |
-| split           | 上述 "name_format" 不同项间的间隔符（默认为 "-"）                                                   | "split": "-"            |
-| date_format     | 上述 "name_format" 中日期格式（默认为 "%Y-%m-%d"(年月日)）                                          | "date_format": "%Y-%m-%d" |
-| proxy           | 网络代理（若使用 clash 的 Tun 模式，就需要这个参数）                                                 | "proxy": "http://127.0.0.1:7897" |
-
-## 可视化UI界面
-
-### 功能特性
-
-- ✅ **账号管理**：自定义添加、编辑、删除下载账号
-- ✅ **日期筛选**：设置下载作品的最早和最晚日期，支持日历选择和手动填写两种方式
-- ✅ **下载选项**：可选择是否下载视频或图集
-- ✅ **自定义保存路径**：自由设置作品保存位置
-- ✅ **Cookie管理**：可视化设置和保存Cookie
-- ✅ **实时下载日志**：查看下载进度和结果
-- ✅ **作品管理**：读取现有账号的作品目录、勾选选择作品、下载选中的作品
-- ✅ **退出程序按钮**：可在UI界面直接退出程序
-- ✅ **自动跳转到网页端**：打开脚本时自动打开浏览器
-- ✅ **网络连接优化**：优先使用无代理连接，提高下载成功率
-- ✅ **视频格式优化**：强制使用.mp4扩展名，避免下载到.dash文件
-
-### 本地运行
-
-1. **安装依赖**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **运行UI界面（推荐）**
-   - 双击运行 `start_ui.bat` 脚本（命令行格式请运行“test_cli.py”脚本）
-   - 脚本会自动启动Streamlit服务器并打开浏览器
-   - 无需手动输入命令，方便快捷
-
-3. **或手动运行**
-   ```bash
-   streamlit run app.py --browser.gatherUsageStats false --server.port 8522
-   ```
-
-4. **访问UI界面**
-   - 打开浏览器访问：http://localhost:8522
-
-### Docker部署（带UI界面）
-
-#### 环境要求
-- Docker
-- Docker Compose
-
-#### Docker Compose部署示例
-
-在项目根目录下，我们提供了 `docker-compose.ui.yml` 文件作为部署示例。以下是配置内容：
-
-```yaml
-
-services:
-  douyin-download-ui:
-    build:
-      context: .
-      dockerfile: Dockerfile.ui
-    container_name: douyin-download-ui
-    restart: unless-stopped
-    ports:
-      - "8501:8501"
-    volumes:
-      - /data:/app/data:rw
-      - /downloads:/app/downloads:rw
-      - /cookies.json:/app/cookies.json:rw
-      - /settings_default.json:/app/settings_default.json:rw
-      - /settings_mine.json:/app/settings_mine.json:rw
-    environment:
-      - TZ=Asia/Shanghai
-      - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
-      - STREAMLIT_SERVER_ENABLE_CORS=true
-      - STREAMLIT_SERVER_ENABLE_WEBSOCKETS=true
-      - DOCKER_CONTAINER=true
+```bash
+# 安装依赖包
+pip install -r requirements.txt
 ```
 
-**配置说明**：
-- **volumes**：挂载目录，您可以根据实际情况修改为本地目录路径
-  - `/data`：存储数据文件
-  - `/downloads`：存储下载的作品
-  - `/cookies.json`：存储Cookie文件
-  - `/settings_default.json`：默认配置文件
-  - `/settings_mine.json`：用户自定义配置文件
-- **environment**：环境变量设置
-  - `TZ`：时区设置为亚洲/上海
-  - `STREAMLIT_SERVER_PORT`：Streamlit服务器端口
-  - `STREAMLIT_SERVER_ADDRESS`：Streamlit服务器地址
-  - `DOCKER_CONTAINER`：标记为Docker容器环境
+### 2. 启动服务
 
-#### 部署步骤
+```bash
+# 开发模式（带自动重载）
+python -m uvicorn main:app --reload
 
-1. **克隆项目代码**
-   ```bash
-   git clone <项目仓库地址>
-   cd <项目目录>
-   ```
+# 生产模式（使用多进程）
+python -m uvicorn main:app --host 0.0.0.0 --port 8501 --workers 2
+```
 
-2. **修改配置文件（可选）**
-   - 根据您的实际需求，修改 `docker-compose.ui.yml` 文件中的卷挂载路径
+### 3. 访问前端页面
 
-3. **启动UI服务**
-   ```bash
-   docker-compose -f docker-compose.ui.yml up -d
-   ```
+服务启动后，打开浏览器访问：
+- **前端页面**：`http://localhost:8501/frontend`
+- **API文档**：`http://localhost:8501/docs`
 
-4. **访问UI界面**
-   - 打开浏览器访问：http://server_ip:8501
-   - 将 `server_ip` 替换为您的服务器IP地址
+## 使用指南
 
-5. **使用UI界面**
-   - 在浏览器中完成账号添加、日期设置、Cookie配置等操作
-   - 点击"开始下载"按钮触发下载任务
-   - 查看实时下载日志
-   - 在"作品管理"标签页中，选择账号并点击"加载作品列表"按钮
-   - 浏览作品列表，勾选要下载的作品
-   - 点击"下载选中的作品"按钮，只下载勾选的作品
-   - 下载设置中的保存路径为 ./downloads
-   - Docker部署的Cookie转换工具禁止使用粘贴原始cookie功能，使用鼠标右键粘贴来自浏览器复制的cookie内容即可
-   - 点击"退出程序"按钮，关闭程序
-   - **重要提示**：使用作品管理前需要先在开始下载部分成功下载一次作品，作品管理中的cookie才会加载成功，否则不会读取cookie文件
+### 1. 账号管理
 
-#### 容器管理
+1. **添加账号**：在"账号管理"标签页，填写账号标识、账号主页链接、最早发布日期和最晚发布日期，点击"添加账号"按钮。
+2. **编辑账号**：点击账号旁边的"编辑"按钮，修改账号信息。
+3. **删除账号**：点击账号旁边的"删除"按钮，确认后删除账号。
 
-- **查看容器状态**
-  ```bash
-  docker-compose -f docker-compose.ui.yml ps
-  ```
+#### 账号主页链接格式示例
 
-- **查看容器日志**
-  ```bash
-  docker-compose -f docker-compose.ui.yml logs -f
-  ```
+抖音账号主页链接支持以下格式：
 
-- **停止容器**
-  ```bash
-  docker-compose -f docker-compose.ui.yml down
-  ```
+| 格式 | 示例 | 说明 |
+|------|------|------|
+| 推荐格式 | `https://www.douyin.com/user/MS4wLjABAAAAxyz123?from_tab_name=main&vid=1234567890` | 从抖音网页复制的完整链接 |
 
-- **重启容器**
-  ```bash
-  docker-compose -f docker-compose.ui.yml restart
-  ```
+#### 注意事项
+- **必须是抖音账号主页链接**，不是视频链接或其他页面链接
+- **链接格式**：确保链接以 `https://` 开头
+- **有效性**：添加前请确认链接可以正常访问
+- **地区限制**：如果账号设置了地区限制，可能需要使用代理才能访问
 
-## 免责声明 (Disclaimer)
+### 2. 下载设置
 
-- 本项目仅用于学习和研究使用，不得用于任何商业和非法目的。使用本项目提供的功能，用户需自行承担可能带来的一切法律责任。
+在"下载设置"标签页，您可以设置：
+- **保存文件夹**：下载文件的保存路径
+- **下载视频**：是否下载视频文件
+- **下载图集**：是否下载图片文件
+- **代理设置**：如需使用代理，填写代理地址
+- **超时设置**：下载超时时间（秒）
 
-- 使用本项目的内容，即代表您同意本免责声明的所有条款和条件。如果你不接受以上的免责声明，请立即停止使用本项目。
+### 3. Cookie设置
 
-- 如有侵犯到您的知识产权、个人隐私等，请立即联系我们， 我们将积极配合保护您的权益。
+在"Cookie设置"标签页，粘贴从浏览器复制的抖音Cookie内容，点击"保存Cookie"按钮。
 
-## 项目参考 (Refer)
+> **获取Cookie的方法**：
+> 1. 打开浏览器，访问抖音网站
+> 2. 登录账号
+> 3. 打开开发者工具（F12）
+> 4. 切换到"Network"标签
+> 5. 刷新页面，找到任意请求
+> 6. 在"Headers"中找到"Cookie"字段，复制其值
+> 7. 将复制的Cookie内容粘贴到文本框中
 
-- <https://github.com/GuanDD123/douyin_download> - 原项目地址
-- <https://github.com/NearHuiwen/TiktokDouyinCrawler>
-- <https://github.com/JoeanAmier/TikTokDownloader>
-- <https://github.com/Johnserf-Seed/f2>
-- <https://github.com/Johnserf-Seed/TikTokDownload>
-- <https://github.com/Evil0ctal/Douyin_TikTok_Download_API>
-- <https://github.com/NearHuiwen/TiktokDouyinCrawler>
-- <https://github.com/ihmily/DouyinLiveRecorder>
-- <https://github.com/encode/httpx/>
-- <https://github.com/Textualize/rich>
-- <https://github.com/omnilib/aiosqlite>
-- <https://github.com/borisbabic/browser_cookie3>
-- <https://github.com/pyinstaller/pyinstaller>
-- <https://ffmpeg.org/ffmpeg-all.html>
-- <https://html5up.net/hyperspace>
+### 4. 开始下载
+
+1. 在"开始下载"标签页，选择要下载的账号
+2. 点击"开始下载"按钮
+3. 查看下载状态和进度
+
+### 5. 作品管理
+
+1. 在"作品管理"标签页，选择要查看的账号
+2. 点击"加载作品列表"按钮
+3. 查看作品列表，可点击"预览"按钮预览作品，点击"下载"按钮下载单个作品
+4. 支持批量选择作品进行下载
+
+### 6. 视频预览
+
+1. 在作品列表中，点击作品封面即可预览视频
+2. 点击"预览"按钮打开预览模态框
+3. 视频支持播放、暂停、音量调节、全屏等控制
+4. 如果视频加载失败，可尝试复制视频链接或直接下载
+
+### 7. 运行日志
+
+在"运行日志"标签页，查看系统运行状态和下载日志。
+
+## API接口
+
+### 账号管理
+- `GET /api/accounts` - 获取账号列表
+- `POST /api/accounts` - 创建新账号
+- `PUT /api/accounts/{id}` - 更新账号
+- `DELETE /api/accounts/{id}` - 删除账号
+
+### 设置管理
+- `GET /api/settings` - 获取设置
+- `PUT /api/settings` - 更新设置
+
+### Cookie管理
+- `GET /api/cookie` - 获取Cookie
+- `PUT /api/cookie` - 更新Cookie
+
+### 下载管理
+- `POST /api/download` - 开始下载
+- `GET /api/download/status/{task_id}` - 获取下载状态
+- `POST /api/download/stop/{task_id}` - 停止下载
+
+### 作品管理
+- `GET /api/works` - 获取作品列表
+
+### 视频代理
+- `GET /api/proxy/video` - 代理视频请求，绕过CORS限制
+
+## 常见问题
+
+### 1. 下载失败怎么办？
+
+- **检查网络连接**：确保网络连接正常
+- **检查Cookie**：确保Cookie有效且未过期
+- **检查账号链接**：确保账号主页链接正确
+- **检查代理设置**：如需使用代理，确保代理设置正确
+
+### 2. 视频预览失败怎么办？
+
+- **检查网络连接**：确保网络连接正常
+- **检查视频链接**：点击"复制视频链接"，在浏览器中打开检查链接是否有效
+- **尝试直接下载**：点击"直接下载"按钮，下载视频到本地查看
+
+### 3. 如何提高下载速度？
+
+- **调整并发数**：在`app/core/config.py`中修改`DOWNLOAD_CONCURRENCY`参数
+- **调整超时时间**：在`app/core/config.py`中修改`DOWNLOAD_TIMEOUT`参数
+
+### 4. 如何修改保存文件夹？
+
+在"下载设置"标签页，修改"保存文件夹"字段，点击"保存设置"按钮。
+
+### 5. 如何修改下载文件的命名格式？
+
+在`data/settings_mine.json`文件中，修改`name_format`字段，支持的占位符有：
+- `create_time` - 创建时间
+- `id` - 作品ID
+- `type` - 作品类型
+- `desc` - 作品描述
+
+## 配置说明
+
+### 环境变量
+
+创建`.env`文件，可配置以下环境变量：
+
+```env
+# 应用设置
+APP_NAME=抖音作品下载工具
+APP_VERSION=1.0.0
+DEBUG=False
+
+# 数据库设置
+DATABASE_URL=sqlite:///./douyin_download.db
+
+# 下载设置
+DOWNLOAD_TIMEOUT=300
+DOWNLOAD_CONCURRENCY=5
+
+# 日志设置
+LOG_LEVEL=INFO
+```
+
+### 配置文件
+
+`data/settings_mine.json`文件包含详细的配置项：
+
+- `accounts` - 账号列表
+- `save_folder` - 保存文件夹
+- `download_videos` - 是否下载视频
+- `download_images` - 是否下载图片
+- `name_format` - 文件命名格式
+- `split` - 分隔符
+- `date_format` - 日期格式
+- `proxy` - 代理设置
+- `timeout` - 超时设置
+- `concurrency` - 并发数
+
+### 保存文件夹路径填写说明
+
+#### Docker环境
+在Docker部署环境中，保存文件夹路径需要填写**容器内的路径**，推荐使用以下路径：
+
+| 路径 | 说明 | 对应宿主机位置 |
+|------|------|----------------|
+| `/app/downloads` | 持久化下载目录 | `./downloads` (宿主机当前目录) |
+| `/app/data` | 配置和Cookie目录 | `./data` (宿主机当前目录) |
+
+#### 路径填写规则
+- **使用绝对路径**：以 `/` 开头，如 `/app/downloads`
+- **路径分隔符**：使用 `/`（Linux格式），不要使用 `\`（Windows格式）
+- **持久化存储**：必须使用在Docker Compose中挂载的路径，否则容器重启后文件会丢失
+- **权限问题**：容器内的 `/app/data` 和 `/app/downloads` 目录已经设置了777权限，可以正常读写
+
+#### 示例
+- **正确**：`/app/downloads`（文件会保存在宿主机的 `./downloads` 目录）
+- **正确**：`/app/downloads/videos`（如果不存在，会自动创建）
+- **错误**：`./downloads`（相对路径，可能导致文件保存在容器内部）
+- **错误**：`C:\downloads`（Windows路径格式，在Linux容器中无效）
+
+## 故障排除
+
+### 1. 服务无法启动
+
+- **检查端口占用**：确保8501端口未被占用
+- **检查依赖**：确保所有依赖已正确安装
+- **检查Python版本**：建议使用Python 3.8+
+
+### 2. API接口返回错误
+
+- **检查日志**：查看终端输出的错误信息
+- **检查参数**：确保请求参数格式正确
+- **检查权限**：确保有足够的文件读写权限
+
+### 3. 下载速度慢
+
+- **检查网络**：确保网络连接稳定
+- **调整并发数**：减少并发数，避免被抖音限制
+- **使用代理**：如需使用代理，确保代理速度快且稳定
+
+### 4. 视频预览失败
+
+- **检查网络**：确保网络连接稳定
+- **检查视频链接**：确保视频链接有效
+- **检查代理功能**：确保视频代理功能正常工作
+
+## 贡献
+
+欢迎贡献代码和提出建议！如有问题，请在GitHub上提交Issue。
+
+## 许可证
+
+本项目采用MIT许可证。
+
+## 免责声明
+
+本工具仅用于学习和研究目的，请勿用于商业用途或侵犯他人权益。使用本工具时，请遵守相关法律法规。
+
+---
+
+**祝使用愉快！🎉**

@@ -1,0 +1,27 @@
+[
+    {
+        "id": "7606938099470713064",
+        "desc": "抖音视频测试",
+        "create_time": "2026-02-24",
+        "type": "视频",
+        "width": 1920,
+        "height": 1080,
+        "downloads": [
+            "https://v3-dy.bytecdn.cn/video/tos/cn/tos-cn-ve-27740c00/o7606938099470713064/"
+        ],
+        "cover_url": "https://p3-dy.byteimg.com/aweme/720x720/7606938099470713064.jpg"
+    },
+    {
+        "id": "7606938099470713065",
+        "desc": "抖音图集测试",
+        "create_time": "2026-02-24",
+        "type": "图集",
+        "width": 1920,
+        "height": 1080,
+        "downloads": [
+            "https://p3-dy.byteimg.com/aweme/720x720/7606938099470713065_1.jpg",
+            "https://p3-dy.byteimg.com/aweme/720x720/7606938099470713065_2.jpg"
+        ],
+        "cover_url": "https://p3-dy.byteimg.com/aweme/720x720/7606938099470713065_1.jpg"
+    }
+]

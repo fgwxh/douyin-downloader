@@ -1,8 +1,8 @@
 from platform import system
 from string import whitespace
-from rich import print
 
 from ..config import Colors
+from .logger import logger
 
 
 class Cleaner:
@@ -21,7 +21,7 @@ class Cleaner:
         elif now_system == 'Linux':
             rule = {'/', '\x00'}  # Linux 系统
         else:
-            print(f'[{Colors.YELLOW}]不受支持的操作系统类型，可能无法正常去除非法字符！')
+            logger.warning('不受支持的操作系统类型，可能无法正常去除非法字符！')
             rule = set()
         return rule | {i for i in whitespace[1:]}  # 补充换行符等非法字符
 

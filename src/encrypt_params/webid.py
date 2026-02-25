@@ -1,9 +1,9 @@
 from requests import exceptions
 from json import dumps
-from rich import print
 
 from .general import send_post
 from ..config import USER_AGENT, Colors
+from ..tool import logger
 
 
 class WebID:
@@ -24,4 +24,4 @@ class WebID:
                 return response.json().get('web_id')
             raise KeyError
         except (exceptions.JSONDecodeError, KeyError):
-            print(f'[{Colors.RED}]获取 webid 参数失败！')
+            logger.error(f'获取 webid 参数失败！')

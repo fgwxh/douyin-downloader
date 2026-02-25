@@ -13,7 +13,7 @@
     "name_format": ["create_time", "id", "type", "desc"],
     "split": "-",
     "date_format": "%Y-%m-%d",
-    "proxy": "http://192.168.5.4:7899",
+    "proxy": "",
     "file_description_max_length": 64,
     "chunk_size": 1048576,
     "timeout": 300,

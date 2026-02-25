@@ -1,0 +1,602 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* 标题样式 */
+h1 {
+    text-align: center;
+    color: #1890ff;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1890ff;
+}
+
+h3 {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* 标签页样式 */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 10px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-button.active {
+    background-color: #1890ff;
+    color: #fff;
+}
+
+/* 标签内容样式 */
+.tab-content {
+    min-height: 400px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #666;
+}
+
+.form-note {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #1890ff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #40a9ff;
+}
+
+button:active {
+    background-color: #096dd9;
+}
+
+/* Cookie按钮样式 */
+.cookie-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cookie-buttons button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#clear-cookie {
+    background-color: #ff4d4f;
+}
+
+#clear-cookie:hover {
+    background-color: #ff7875;
+}
+
+/* 区块样式 */
+.section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #fafafa;
+    border-radius: 8px;
+}
+
+/* 账号列表样式 */
+.account-item {
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.account-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-item h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.account-item p {
+    margin-bottom: 5px;
+    color: #666;
+    font-size: 14px;
+}
+
+.account-actions {
+    margin-top: 10px;
+}
+
+.account-actions button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* 批量下载控制区域样式 */
+.batch-download-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.batch-download-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 15px 0;
+    width: 100%;
+}
+
+.batch-download-controls button {
+    padding: 12px 24px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+}
+
+/* 移除最后一个按钮的右边距 */
+.batch-download-controls button:last-child {
+    margin-right: 20px;
+}
+
+#selected-count {
+    margin-left: auto;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    padding: 12px 20px;
+    background-color: #fff;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.batch-download-controls button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+/* 全选按钮样式 */
+.batch-download-controls button:first-child {
+    background-color: #52c41a;
+}
+
+.batch-download-controls button:first-child:hover {
+    background-color: #73d13d;
+}
+
+/* 取消全选按钮样式 */
+.batch-download-controls button:nth-child(2) {
+    background-color: #faad14;
+}
+
+.batch-download-controls button:nth-child(2):hover {
+    background-color: #ffc53d;
+}
+
+/* 批量下载按钮样式 */
+.batch-download-controls button:nth-child(3) {
+    background-color: #1890ff;
+}
+
+.batch-download-controls button:nth-child(3):hover {
+    background-color: #40a9ff;
+}
+
+#selected-count {
+    margin-left: auto;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 作品列表样式 */
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.work-item {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.work-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* 作品复选框样式 */
+.work-checkbox {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+}
+
+.work-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #1890ff;
+}
+
+.work-item h4 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    padding-left: 30px; /* 为复选框留出空间 */
+    line-height: 1.4;
+}
+
+.work-item p {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 14px;
+    padding-left: 30px; /* 为复选框留出空间 */
+    line-height: 1.5;
+}
+
+.work-actions {
+    margin-top: 20px;
+    padding-left: 30px; /* 为复选框留出空间 */
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.work-actions button {
+    margin-right: 15px;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.work-actions button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+/* 日志样式 */
+#logs-content {
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 2px;
+}
+
+.log-entry.info {
+    background-color: #e6f7ff;
+    color: #1890ff;
+}
+
+.log-entry.success {
+    background-color: #f6ffed;
+    color: #52c41a;
+}
+
+.log-entry.warning {
+    background-color: #fffbe6;
+    color: #faad14;
+}
+
+.log-entry.error {
+    background-color: #fff1f0;
+    color: #f5222d;
+}
+
+/* 状态样式 */
+#download-status {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
+/* 作品管理控制样式 */
+.works-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.works-controls button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#cancel-load-works {
+    background-color: #ff4d4f;
+}
+
+#cancel-load-works:hover {
+    background-color: #ff7875;
+}
+
+#cancel-load-works:disabled {
+    background-color: #d9d9d9;
+    cursor: not-allowed;
+}
+
+/* 开关按钮样式 */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + label {
+    background-color: #1890ff;
+}
+
+.toggle-switch input:checked + label:before {
+    transform: translateX(26px);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #666;
+}
+
+.form-note {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+}
+
+/* 加载状态样式 */
+#works-loading {
+    margin: 30px 0;
+    padding: 40px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 4px solid rgba(24, 144, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: #1890ff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+/* 进度条样式 */
+.progress-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #1890ff;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-button {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .works-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .works-controls {
+        flex-direction: column;
+    }
+    
+    .cookie-buttons {
+        flex-direction: column;
+    }
+    
+    .batch-download-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    #selected-count {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+    }
+}

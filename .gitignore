@@ -85,3 +85,12 @@ pytest_cache/
 # Backup files
 *.bak
 *.backup
+
+# Sensitive files
+data/cookies.json
+data/encryption_key.key
+data/settings_mine.json
+cookies.json
+encryption_key.key
+settings_mine.json
+selected_items.json

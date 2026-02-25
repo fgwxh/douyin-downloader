@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抖音作品下载工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23ff0000' d='M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8S12.42 0 8 0zm0 14.5c-3.59 0-6.5-2.91-6.5-6.5S4.41 1.5 8 1.5 14.5 4.41 14.5 8 11.59 14.5 8 14.5zm3.5-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zm-7 0c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zm3.5 2.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z'/%3E%3C/svg%3E" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 抖音作品下载工具</h1>
+        
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="accounts">📁 账号管理</button>
+            <button class="tab-button" data-tab="settings">⚙️ 下载设置</button>
+            <button class="tab-button" data-tab="cookie">🍪 Cookie设置</button>
+            <button class="tab-button" data-tab="download">▶️ 开始下载</button>
+            <button class="tab-button" data-tab="works">📋 作品管理</button>
+            <button class="tab-button" data-tab="logs">📜 运行日志</button>
+            <button class="tab-button" data-tab="config">⚙️ 配置管理</button>
+        </nav>
+        
+        <div class="tab-content">
+            <!-- 账号管理 -->
+            <div id="accounts" class="tab-pane active">
+                <h2>账号管理</h2>
+                
+                <div class="section">
+                    <h3>添加新账号</h3>
+                    <form id="add-account-form">
+                        <div class="form-group">
+                            <label for="mark">账号标识</label>
+                            <input type="text" id="mark" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="url">账号主页链接</label>
+                            <input type="text" id="url" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="earliest">最早发布日期</label>
+                            <input type="date" id="earliest" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="latest">最晚发布日期</label>
+                            <input type="date" id="latest" required>
+                        </div>
+                        <button type="submit">添加账号</button>
+                    </form>
+                </div>
+                
+                <div class="section" id="edit-account-section" style="display: none;">
+                    <h3>编辑账号</h3>
+                    <form id="edit-account-form">
+                        <input type="hidden" id="edit-account-id">
+                        <div class="form-group">
+                            <label for="edit-mark">账号标识</label>
+                            <input type="text" id="edit-mark" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-url">账号主页链接</label>
+                            <input type="text" id="edit-url" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-earliest">最早发布日期</label>
+                            <input type="date" id="edit-earliest" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-latest">最晚发布日期</label>
+                            <input type="date" id="edit-latest" required>
+                        </div>
+                        <button type="submit">保存修改</button>
+                        <button type="button" onclick="cancelEditAccount()">取消</button>
+                    </form>
+                </div>
+                
+                <div class="section">
+                    <h3>现有账号</h3>
+                    <div id="accounts-list">
+                        <!-- 账号列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 下载设置 -->
+            <div id="settings" class="tab-pane">
+                <h2>下载设置</h2>
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="save-folder">保存文件夹</label>
+                        <input type="text" id="save-folder" value=".">
+                    </div>
+                    <div class="form-group">
+                        <label for="download-videos">下载视频</label>
+                        <input type="checkbox" id="download-videos" checked>
+                    </div>
+                    <div class="form-group">
+                        <label for="download-images">下载图集</label>
+                        <input type="checkbox" id="download-images">
+                    </div>
+                    <div class="form-group">
+                        <label for="proxy">代理设置</label>
+                        <input type="text" id="proxy" placeholder="留空表示不使用代理">
+                    </div>
+                    <div class="form-group">
+                        <label for="timeout">超时设置</label>
+                        <input type="number" id="timeout" value="300" min="1">
+                    </div>
+                    <button type="submit">保存设置</button>
+                </form>
+            </div>
+            
+            <!-- Cookie设置 -->
+            <div id="cookie" class="tab-pane">
+                <h2>Cookie设置</h2>
+                <div class="form-group">
+                    <label for="cookie-input">Cookie内容</label>
+                    <textarea id="cookie-input" rows="10" placeholder="请粘贴从浏览器复制的Cookie内容"></textarea>
+                </div>
+                <div class="cookie-buttons">
+                    <button id="save-cookie">保存Cookie</button>
+                    <button id="clear-cookie">清空Cookie</button>
+                </div>
+            </div>
+            
+            <!-- 开始下载 -->
+            <div id="download" class="tab-pane">
+                <h2>开始下载</h2>
+                <div class="form-group">
+                    <label for="download-account">选择账号</label>
+                    <select id="download-account"></select>
+                </div>
+                <button id="start-download">开始下载</button>
+                <div id="download-status"></div>
+            </div>
+            
+            <!-- 作品管理 -->
+            <div id="works" class="tab-pane">
+                <h2>作品管理</h2>
+                <div class="form-group">
+                    <label for="works-account">选择账号</label>
+                    <select id="works-account"></select>
+                </div>
+                <div class="form-group">
+                    <label for="works-year">选择年份</label>
+                    <select id="works-year">
+                        <option value="2000">2000</option>
+                        <option value="2001">2001</option>
+                        <option value="2002">2002</option>
+                        <option value="2003">2003</option>
+                        <option value="2004">2004</option>
+                        <option value="2005">2005</option>
+                        <option value="2006">2006</option>
+                        <option value="2007">2007</option>
+                        <option value="2008">2008</option>
+                        <option value="2009">2009</option>
+                        <option value="2010">2010</option>
+                        <option value="2011">2011</option>
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                        <option value="2031">2031</option>
+                        <option value="2032">2032</option>
+                        <option value="2033">2033</option>
+                        <option value="2034">2034</option>
+                        <option value="2035">2035</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="works-month">选择月份</label>
+                    <select id="works-month">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="use-year-month">使用年份月份筛选</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="use-year-month">
+                        <label for="use-year-month"></label>
+                    </div>
+                    <div class="form-note">* 当启用此功能后，现有账号中已指定的日期不可用。</div>
+                </div>
+                <div class="works-controls">
+                    <button id="load-works">加载作品列表</button>
+                    <button id="cancel-load-works" disabled>取消加载</button>
+                </div>
+                <div id="works-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">正在加载作品列表，请稍候...</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="works-progress-bar"></div>
+                        <div class="progress-text" id="works-progress-text">0%</div>
+                    </div>
+                </div>
+                <div id="works-list">
+                    <!-- 作品列表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 运行日志 -->
+            <div id="logs" class="tab-pane">
+                <h2>运行日志</h2>
+                <div id="logs-content">
+                    <!-- 日志将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 配置管理 -->
+            <div id="config" class="tab-pane">
+                <h2>配置管理</h2>
+                <div class="section">
+                    <h3>导入配置</h3>
+                    <div class="form-group">
+                        <label for="import-config-file">选择配置文件</label>
+                        <input type="file" id="import-config-file" accept=".json">
+                    </div>
+                    <div class="form-group">
+                        <label for="import-config-input">配置内容</label>
+                        <textarea id="import-config-input" rows="10" placeholder="请粘贴配置文件内容"></textarea>
+                    </div>
+                    <button id="import-config">导入配置</button>
+                </div>
+                
+                <div class="section">
+                    <h3>导出配置</h3>
+                    <button id="export-config">导出当前配置</button>
+                </div>
+                
+                <div class="section">
+                    <h3>初始化配置</h3>
+                    <button id="init-config">初始化配置</button>
+                </div>
+                
+                <div class="section">
+                    <h3>当前配置</h3>
+                    <pre id="current-config"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
